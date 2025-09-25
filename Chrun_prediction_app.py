@@ -12,6 +12,7 @@ st.set_page_config(
     page_icon="📊",
     layout="wide",
     initial_sidebar_state="expanded")
+
 st.markdown("""
 <style>
     .main-header {
@@ -45,13 +46,19 @@ st.markdown("""
 @st.cache_resource
 def load_model():
     try:
+        st.write("Checking for model file...")
         if os.path.exists("best_churn_model.pkl"):
-            return joblib.load("best_churn_model.pkl")
+            st.write("Model file found, loading...")
+            model = joblib.load("best_churn_model.pkl")
+            st.write("Model loaded successfully!")
+            return model
         else:
-            st.error("❌ Model file 'best_churn_model.pkl' not found. Please ensure the model file is in the same directory as this app.")
+            st.error("❌ Model file 'best_churn_model.pkl' not found.")
+            st.write("Available files:", os.listdir("."))
             st.stop()
     except Exception as e:
         st.error(f"❌ Error loading model: {str(e)}")
+        st.write("Available files:", os.listdir("."))
         st.stop()
 
 def validate_inputs(monthly_charges, total_charges, tenure):
@@ -138,9 +145,9 @@ def main():
         "Bank transfer (automatic)", "Credit card (automatic)"])
     
     st.sidebar.subheader("💵 Financial Details")
-    tenure = st.sidebar.slider("Tenure (months)", min_value=0, max_value=72, value=12)
-    monthly_charges = st.sidebar.slider("Monthly Charges ($)", min_value=0.0, max_value=200.0, value=50.0, step=0.1)
-    total_charges = st.sidebar.slider("Total Charges ($)", min_value=0.0, max_value=10000.0, value=500.0, step=1.0)
+    tenure = st.sidebar.slider("Tenure (months)", min_value=0, max_value=72, value=0)
+    monthly_charges = st.sidebar.slider("Monthly Charges ($)", min_value=0.0, max_value=200.0, value=0.0, step=0.1)
+    total_charges = st.sidebar.slider("Total Charges ($)", min_value=0.0, max_value=10000.0, value=0.0, step=1.0)
     
     validation_errors = validate_inputs(monthly_charges, total_charges, tenure)
     if validation_errors:
